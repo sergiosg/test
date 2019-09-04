@@ -1,6 +1,33 @@
-language: node_js
-node_js:
- - "node"
+dist: trusty
+language: java
+branches:
+  only:
+  - master
+install:
+- sudo start-docker-daemon
+jdk:
+- oraclejdk8
+before_cache:
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+cache:
+  directories:
+  - "$HOME/.m2"
+  - "$HOME/.gradle/caches"
+  - "$HOME/.gradle/wrapper"
+  - build
+stages:
+- name: Build
+jobs:
+  include:
+  - stage: Build
+    script:
+    - "./gradlew build installDist --stacktrace"
+after_failure:
+- reports-publisher
+after_success:
+- reports-publisher
 env:
-- MY_VAR=EverythingIsAwesome
-- NODE_ENV=TEST
+  global:
+    ROOT_USER: sergio
